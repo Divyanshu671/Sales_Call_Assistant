@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv("env")
-key = os.getenv("groq_key")
+key = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=key)
 nlp = spacy.load("en_core_web_md")
 dataset = pd.read_excel(r"Conversation_data.xlsx")
