@@ -130,8 +130,8 @@ st.markdown(
 def encode_image_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
-MOBILE_LOGO_PATH = r"data\mobile.jpg"
-LAPTOP_LOGO_PATH = r"data\laptop.jpg"
+MOBILE_LOGO_PATH = "data/mobile.jpg"
+LAPTOP_LOGO_PATH = "data/laptop.jpg"
 if Path(MOBILE_LOGO_PATH).is_file() or not Path(LAPTOP_LOGO_PATH).is_file():
     # Encode images
     mobile_logo_base64 = encode_image_base64(MOBILE_LOGO_PATH)
