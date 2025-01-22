@@ -4,9 +4,6 @@ import spacy
 import numpy as np
 from groq import Groq
 import os
-from dotenv import load_dotenv
-
-load_dotenv("env")
 key = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=key)
 nlp = spacy.load("en_core_web_md")
