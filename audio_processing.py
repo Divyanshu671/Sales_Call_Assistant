@@ -7,16 +7,16 @@ import numpy as np
 
 whisper_model = whisper.load_model("base")
 
-def check_audio_device():
-    devices = sd.query_devices()
-    for i, device in enumerate(devices):
-        st.write(f"Device {i}: {device['name']}")
+# def check_audio_device():
+#     devices = sd.query_devices()
+#     for i, device in enumerate(devices):
+#         st.write(f"Device {i}: {device['name']}")
 
 def record_audio(filename="output.wav", duration=4, device_id=None):
     RATE = 16000
     CHANNELS = 1
 
-    check_audio_device()
+    # check_audio_device()
 
     try:
         if device_id is None:
