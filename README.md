@@ -1,12 +1,13 @@
 ---
-title: Real Time AI Sales Call Assistant
-emoji: 📚
-colorFrom: blue
-colorTo: green
+title: Sales Call Assistant
+emoji: 📞
+colorFrom: indigo
+colorTo: blue
 sdk: streamlit
 sdk_version: 1.41.1
 app_file: app.py
 pinned: false
 ---
+# Sales_Call_Assistant
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+A Real time AI based sales call assistant.

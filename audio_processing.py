@@ -1,36 +1,25 @@
-import pyaudio
+import sounddevice as sd
 import wave
 import whisper
 from pydub import AudioSegment
+import numpy as np
 
 whisper_model = whisper.load_model("base")
 
 def record_audio(filename="output.wav", duration=4):
-    CHUNK = 1024
-    FORMAT = pyaudio.paInt16
-    CHANNELS = 1
     RATE = 16000
-    RECORD_SECONDS = duration
-    WAVE_OUTPUT_FILENAME = filename
+    CHANNELS = 1
 
-    p = pyaudio.PyAudio()
-    stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
-    frames = []
+    print("Recording...")
+    audio_data = sd.rec(int(duration * RATE), samplerate=RATE, channels=CHANNELS, dtype=np.int16)
+    sd.wait()
+    print("Recording finished.")
 
-    for _ in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-        data = stream.read(CHUNK)
-        frames.append(data)
-
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
-
-    wf = wave.open(WAVE_OUTPUT_FILENAME, "wb")
-    wf.setnchannels(CHANNELS)
-    wf.setsampwidth(p.get_sample_size(FORMAT))
-    wf.setframerate(RATE)
-    wf.writeframes(b''.join(frames))
-    wf.close()
+    with wave.open(filename, "wb") as wf:
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(2)
+        wf.setframerate(RATE)
+        wf.writeframes(audio_data.tobytes())
 
 def transcribe_audio(audio="output.wav"):
     segment = AudioSegment.from_wav(audio)
