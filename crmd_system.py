@@ -3,10 +3,11 @@ import pandas as pd
 import spacy
 import numpy as np
 from groq import Groq
-from dotenv import dotenv_values
+import os
+from dotenv import load_dotenv
 
-config = dotenv_values("env")
-key = config.get("groq_key")
+load_dotenv("env")
+key = os.getenv("groq_key")
 client = Groq(api_key=key)
 nlp = spacy.load("en_core_web_md")
 dataset = pd.read_excel(r"Conversation_data.xlsx")
