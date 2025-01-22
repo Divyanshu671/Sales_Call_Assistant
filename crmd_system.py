@@ -7,12 +7,12 @@ import os
 key = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=key)
 nlp = spacy.load("en_core_web_md")
-dataset = pd.read_excel(r"Conversation_data.xlsx")
+dataset = pd.read_excel("Conversation_data.xlsx")
 
 
 def load_data():
-    laptops = pd.read_csv(r"data\laptop_price.csv",encoding='latin1')
-    mobiles = pd.read_csv(r"data\Flipkart_Mobiles.csv",encoding='latin1')
+    laptops = pd.read_csv("data/laptop_price.csv",encoding='latin1')
+    mobiles = pd.read_csv("data/Flipkart_Mobiles.csv",encoding='latin1')
 
     return [laptops,mobiles]
 
