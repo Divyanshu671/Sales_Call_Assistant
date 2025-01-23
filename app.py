@@ -169,6 +169,7 @@ st.session_state.conversation_history_df = pd.read_excel(history_file, engine='o
 
 def process_audio_and_analyze():
     while True:
+        time.sleep(5)
         st.session_state.index += 1
         if not st.session_state.recording_flag:
             break
@@ -187,7 +188,6 @@ def process_audio_and_analyze():
         except Exception as e:
             st.write(e)
             break
-        time.sleep(3)
 
 def plot_sentiment_data():
     if "conversation_history_df" in st.session_state and not st.session_state.conversation_history_df.empty:
