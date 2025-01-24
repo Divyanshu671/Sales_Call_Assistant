@@ -82,7 +82,7 @@ st.markdown(
 
     /* Output text styling */
     .output-text {
-        color: green; /* Vibrant teal for outputs */
+        color: red; /* Vibrant teal for outputs */
         font-size: 18px;
         font-weight: bold;
     }
@@ -174,15 +174,16 @@ def process_audio_and_analyze():
             break
         try:
             record_audio()
-            transcription = transcribe_audio()
-            transcription = transcription if len(transcription) else "NaN"
-            st.session_state.final_sentiment = sentiment_result = sentiment_analysis("output.wav", transcription)
-            query = [transcription, sentiment_result["Text"], sentiment_result["Tone"]]
-            response = workflow(query)
-            st.session_state.products = response[0]
-            store_response(
-                [st.session_state.index], [query[0]], [query[1][0]], [query[2]["tone"]], [response[1]], [response[2]]
-            )
+            with st.spinner("Processing audio..."):
+                transcription = transcribe_audio()
+                transcription = transcription if len(transcription) else "NaN"
+                st.session_state.final_sentiment = sentiment_result = sentiment_analysis("output.wav", transcription)
+                query = [transcription, sentiment_result["Text"], sentiment_result["Tone"]]
+                response = workflow(query)
+                st.session_state.products = response[0]
+                store_response(
+                  [query[0]], [query[1][0]], [query[2]["tone"]], [response[1]], [response[2]]
+                )
         except Exception as e:
             st.write(e)
             break
@@ -192,35 +193,42 @@ def plot_sentiment_data():
     if "conversation_history_df" in st.session_state and not st.session_state.conversation_history_df.empty:
         data = st.session_state.conversation_history_df
 
-        sentiment_map = {"Positive": 1, "Neutral": 0, "Negative": -1, "Energetic": 1, "Moderate": 0, "Calm": -1}
+        # Map sentiments to numeric values
+        sentiment_map = {"Positive": 1, "Neutral": 0.5, "Negative": -1, "Energetic": 1, "Moderate": 0.5, "Calm": -1}
         data["Tone Sentiment (Numeric)"] = data["Tone Sentiment"].map(sentiment_map)
         data["Text Sentiment (Numeric)"] = data["Text Sentiment"].map(sentiment_map)
 
+        # Check if there are valid sentiment values to plot
         if data[["Tone Sentiment (Numeric)", "Text Sentiment (Numeric)"]].isnull().all().all():
             st.info("No valid sentiment data available for plotting.")
         else:
+            # Create the line chart
             fig = go.Figure()
 
-            fig.add_trace(go.Bar(
-                x=data["Index"].astype(str), 
+            # Add Text Sentiment Line
+            fig.add_trace(go.Scatter(
+                x=data["Index"].astype(str),
                 y=data["Text Sentiment (Numeric)"],
+                mode="lines+markers",
                 name="Text Sentiment",
-                marker=dict(color='rgba(52, 152, 219, 0.8)'),
-                width=0.35
+                line=dict(color='rgba(52, 152, 219, 0.8)', width=2),
+                marker=dict(size=8, symbol="circle", color='rgba(52, 152, 219, 1)')
             ))
 
-            fig.add_trace(go.Bar(
+            # Add Tone Sentiment Line
+            fig.add_trace(go.Scatter(
                 x=data["Index"].astype(str),
                 y=data["Tone Sentiment (Numeric)"],
+                mode="lines+markers",
                 name="Tone Sentiment",
-                marker=dict(color='rgba(230, 126, 34, 0.8)'),  
-                width=0.35
+                line=dict(color='rgba(230, 126, 34, 0.8)', width=2),
+                marker=dict(size=8, symbol="square", color='rgba(230, 126, 34, 1)')
             ))
 
+            # Update layout for dark theme and styling
             fig.update_layout(
-                title="Sentiment Analysis - Bar Chart",
+                title="Sentiment Analysis - Line Chart",
                 title_font=dict(family="Segoe UI, sans-serif", size=24, color="white"),
-                barmode='group',
                 xaxis=dict(
                     title="Index",
                     tickmode='array',
@@ -237,20 +245,22 @@ def plot_sentiment_data():
                     title_font=dict(family="Segoe UI, sans-serif", size=18, color='white'),
                     tickfont=dict(family="Segoe UI, sans-serif", size=14, color='white')
                 ),
-                plot_bgcolor='rgb(32, 32, 32)', 
-                paper_bgcolor='rgb(32, 32, 32)',
+                plot_bgcolor='rgb(32, 32, 32)',  # Dark background
+                paper_bgcolor='rgb(32, 32, 32)',  # Dark background
                 legend=dict(
                     x=0.8, y=1, traceorder='normal',
                     font=dict(family="Segoe UI, sans-serif", size=14, color='white'),
                     bgcolor='rgba(0, 0, 0, 0.5)', bordercolor='white', borderwidth=1
                 ),
-                margin=dict(l=50, r=50, t=50, b=50)  
+                margin=dict(l=50, r=50, t=50, b=50)  # Adjust margins
             )
 
+            # Display the chart in Streamlit
             st.plotly_chart(fig)
 
     else:
         st.info("No conversation history available to plot.")
+
 def plot_process_usage():
     labels = ['Audio Recording', 'Audio Transcription', 'Tone Sentiment Analysis', 
               'Text Sentiment Analysis', 'Recommendation and Responding']

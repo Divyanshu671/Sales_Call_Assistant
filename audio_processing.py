@@ -9,9 +9,9 @@ def record_audio(filename="output.wav", duration=4):
     RATE = 16000  
     CHANNELS = 1  
     CHUNK = 1024  
-    FORMAT = pyaudio.paInt16  # 16-bit format
+    FORMAT = pyaudio.paInt16  
 
-    p = pyaudio.PyAudio()  # Initialize PyAudio
+    p = pyaudio.PyAudio()  
 
     try:
         stream = p.open(format=FORMAT,
@@ -21,7 +21,7 @@ def record_audio(filename="output.wav", duration=4):
                         input_device_index=0,
                         frames_per_buffer=CHUNK)
 
-        frames = []  # Store audio data
+        frames = []  
         for _ in range(0, int(RATE / CHUNK * duration)):
             data = stream.read(CHUNK)
             frames.append(data)
@@ -30,7 +30,6 @@ def record_audio(filename="output.wav", duration=4):
         stream.close()
         p.terminate()
 
-        # Save the recorded audio to a file
         with wave.open(filename, "wb") as wf:
             wf.setnchannels(CHANNELS)
             wf.setsampwidth(p.get_sample_size(FORMAT))
@@ -47,7 +46,6 @@ def transcribe_audio(audio="output.wav"):
         if not os.path.exists(audio):
             raise FileNotFoundError(f"Audio file {audio} does not exist!")
 
-        # Process and transcribe the audio
         segment = AudioSegment.from_wav(audio)
         segment = segment.set_channels(1).set_frame_rate(16000)
         segment.export(audio, format='wav')

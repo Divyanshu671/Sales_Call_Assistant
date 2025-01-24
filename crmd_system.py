@@ -5,7 +5,7 @@ import numpy as np
 from groq import Groq
 import os
 key = os.getenv("GROQ_API_KEY")
-client = Groq(api_key=key)
+client = Groq(api_key="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")
 nlp = spacy.load("en_core_web_md")
 dataset = pd.read_excel("Conversation_data.xlsx")
 
@@ -142,7 +142,8 @@ def summary():
     system_prompt = {
         "role": "system",
         "content": "You are a helpful assistant. Respond in brief where you are summarizing all the previous conversations"
-        "in a short and compact manner , you need to also summarize text and tone sentimental shifts and there is no need to give premise."
+        "based on message , text sentiment, tone sentiment and give a combined summary upto 100 words"
+        "in a compact text format and there is no need to give premise."
     }
 
     chat_history = [system_prompt]
@@ -162,7 +163,7 @@ def summary():
         response = client.chat.completions.create(
             model="llama3-70b-8192",  
             messages=chat_history,
-            max_tokens=100,
+            max_tokens=200,
             temperature=1.2
         )
 

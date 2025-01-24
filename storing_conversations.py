@@ -1,9 +1,18 @@
 import pandas as pd
 from openpyxl import load_workbook
+import pandas as pd
     
-def store_response(i,transcription,text_sentiment,tone_sentiment,recommendation_response,objection_response):
+def store_response(transcription,text_sentiment,tone_sentiment,recommendation_response,objection_response):
+    try:
+        conversation_data = pd.read_excel("Conversation_data.xlsx")
+        if not conversation_data.empty:
+            new_index = conversation_data["Index"].iloc[-1] + 1 
+        else:
+            new_index = 0  
+    except FileNotFoundError:
+        new_index = 0
     data = {
-            "Index": i,
+            "Index": new_index,
             "Message": transcription,
             "Text Sentiment": text_sentiment,
             "Tone Sentiment": tone_sentiment,
