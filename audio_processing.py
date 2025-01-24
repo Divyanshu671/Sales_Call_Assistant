@@ -3,24 +3,22 @@ import wave
 import whisper
 from pydub import AudioSegment
 
-# Load the Whisper model
 whisper_model = whisper.load_model("base")
 
 def record_audio(filename="output.wav", duration=4):
-    RATE = 16000  # Sampling rate
-    CHANNELS = 1  # Mono channel
-    CHUNK = 1024  # Buffer size for audio stream
+    RATE = 16000  
+    CHANNELS = 1  
+    CHUNK = 1024  
     FORMAT = pyaudio.paInt16  # 16-bit format
 
     p = pyaudio.PyAudio()  # Initialize PyAudio
 
     try:
-        # Open a stream with default input device
         stream = p.open(format=FORMAT,
                         channels=CHANNELS,
                         rate=RATE,
                         input=True,
-                        
+                        input_device_index=0,
                         frames_per_buffer=CHUNK)
 
         frames = []  # Store audio data

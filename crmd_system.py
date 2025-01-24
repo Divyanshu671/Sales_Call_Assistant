@@ -125,7 +125,7 @@ def detect_product_type(text):
 def workflow(query):
     product_type = detect_product_type(query[0])
     if product_type=="unknown":
-        return ["none","none","Please provide more specific deatils!!"]
+        return ["none","Not available",generate_objection_response(query[0],query[1],query[2])]
     laptops, mobiles = load_data()
     data = laptops if product_type.lower()=="laptops" else mobiles
 
@@ -136,3 +136,38 @@ def workflow(query):
     objection_response = generate_objection_response(query[0], query[1], query[2])
 
     return [recommendations, recommendation_response, objection_response]
+
+def summary():
+    message = dataset.to_string(index=False)
+    system_prompt = {
+        "role": "system",
+        "content": "You are a helpful assistant. Respond in brief where you are summarizing all the previous conversations"
+        "in a short and compact manner , you need to also summarize text and tone sentimental shifts and there is no need to give premise."
+    }
+
+    chat_history = [system_prompt]
+
+
+    try:
+        dataset_summary = message
+        user_message = f"\nDataset Insights: {dataset_summary}"
+    except FileNotFoundError:
+        user_message = "\nDataset Insights: Conversation history dataset not found."
+    except Exception as e:
+        user_message = f"\nDataset Insights: Error loading dataset - {e}"
+
+    chat_history.append({"role": "user", "content": user_message})
+
+    try:
+        response = client.chat.completions.create(
+            model="llama3-70b-8192",  
+            messages=chat_history,
+            max_tokens=100,
+            temperature=1.2
+        )
+
+        assistant_response = response.choices[0].message.content
+        return assistant_response
+
+    except Exception as e:
+        return f"Response Error: {e}"
