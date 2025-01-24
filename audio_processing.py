@@ -1,45 +1,55 @@
-import sounddevice as sd
-import streamlit as st
+import pyaudio
 import wave
 import whisper
 from pydub import AudioSegment
-import numpy as np
 
+# Load the Whisper model
 whisper_model = whisper.load_model("base")
 
-# def check_audio_device():
-#     devices = sd.query_devices()
-#     for i, device in enumerate(devices):
-#         st.write(f"Device {i}: {device['name']}")
+def record_audio(filename="output.wav", duration=4):
+    RATE = 16000  # Sampling rate
+    CHANNELS = 1  # Mono channel
+    CHUNK = 1024  # Buffer size for audio stream
+    FORMAT = pyaudio.paInt16  # 16-bit format
 
-def record_audio(filename="output.wav", duration=4, device_id=None):
-    RATE = 16000
-    CHANNELS = 1
-
-    # check_audio_device()
+    p = pyaudio.PyAudio()  # Initialize PyAudio
 
     try:
-        if device_id is None:
-            device_id = 0
-        
-        print("Recording...")
-        audio_data = sd.rec(int(duration * RATE), samplerate=RATE, channels=CHANNELS, dtype=np.int16, device=device_id)
-        sd.wait()
-        print("Recording finished.")
+        # Open a stream with default input device
+        stream = p.open(format=FORMAT,
+                        channels=CHANNELS,
+                        rate=RATE,
+                        input=True,
+                        
+                        frames_per_buffer=CHUNK)
 
+        frames = []  # Store audio data
+        for _ in range(0, int(RATE / CHUNK * duration)):
+            data = stream.read(CHUNK)
+            frames.append(data)
+
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+
+        # Save the recorded audio to a file
         with wave.open(filename, "wb") as wf:
             wf.setnchannels(CHANNELS)
-            wf.setsampwidth(2)
+            wf.setsampwidth(p.get_sample_size(FORMAT))
             wf.setframerate(RATE)
-            wf.writeframes(audio_data.tobytes())
+            wf.writeframes(b''.join(frames))
 
-    except sd.PortAudioError as e:
-        print(f"Error recording audio: {e}")
     except Exception as e:
-        print(f"Unexpected error: {e}")
+        print(f"Error recording audio: {e}")
+        p.terminate()
 
 def transcribe_audio(audio="output.wav"):
     try:
+        import os
+        if not os.path.exists(audio):
+            raise FileNotFoundError(f"Audio file {audio} does not exist!")
+
+        # Process and transcribe the audio
         segment = AudioSegment.from_wav(audio)
         segment = segment.set_channels(1).set_frame_rate(16000)
         segment.export(audio, format='wav')
@@ -48,5 +58,7 @@ def transcribe_audio(audio="output.wav"):
         transcription = result["text"]
         return transcription
 
+    except FileNotFoundError as e:
+        print(e)
     except Exception as e:
         print(f"Error transcribing audio: {e}")
