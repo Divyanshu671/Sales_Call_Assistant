@@ -6,19 +6,22 @@ from pydub import AudioSegment
 whisper_model = whisper.load_model("base")
 
 def record_audio(filename="output.wav", duration=4):
-    RATE = 16000  
-    CHANNELS = 1  
+    p = pyaudio.PyAudio()  
+    INPUT_DEVICE_INDEX = 1 
+    OUTPUT_DEVICE_INDEX = 3
+
+    input_device = p.get_device_info_by_index(INPUT_DEVICE_INDEX)
+    output_device = p.get_device_info_by_index(OUTPUT_DEVICE_INDEX)
+    CHANNELS = input_device['maxInputChannels']
+    RATE = int(input_device['defaultSampleRate']) 
     CHUNK = 1024  
     FORMAT = pyaudio.paInt16  
-
-    p = pyaudio.PyAudio()  
-
     try:
         stream = p.open(format=FORMAT,
                         channels=CHANNELS,
                         rate=RATE,
                         input=True,
-                        input_device_index=0,
+                        input_device_index=INPUT_DEVICE_INDEX,
                         frames_per_buffer=CHUNK)
 
         frames = []  
