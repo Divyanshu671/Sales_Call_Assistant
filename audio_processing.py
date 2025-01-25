@@ -2,6 +2,7 @@ import sounddevice as sd
 import wave
 import whisper
 from pydub import AudioSegment
+import streamlit as st
 
 whisper_model = whisper.load_model("turbo")
 
@@ -11,7 +12,7 @@ def record_audio(filename="output.wav", duration=4):
     RATE = 16000
     CHUNK = 1024  
     devices = sd.query_devices()
-    print(devices)
+    st.write(devices)
     try:
         recording = sd.rec(int(duration * RATE), samplerate=RATE, channels=CHANNELS, dtype='int16', device=INPUT_DEVICE_INDEX)
         sd.wait()
