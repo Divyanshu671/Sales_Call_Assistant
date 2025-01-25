@@ -23,7 +23,6 @@ def record_audio(filename="output.wav", duration=4):
 
     except Exception as e:
         print(f"Error recording audio: {e}")
-        p.terminate()
 
 def transcribe_audio(audio="output.wav"):
     try:
