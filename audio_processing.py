@@ -1,4 +1,4 @@
-import pyaudio
+import sounddevice as sd
 import wave
 import whisper
 from pydub import AudioSegment
@@ -6,35 +6,20 @@ from pydub import AudioSegment
 whisper_model = whisper.load_model("base")
 
 def record_audio(filename="output.wav", duration=4):
-    p = pyaudio.PyAudio()  
     INPUT_DEVICE_INDEX = 0
-
     CHANNELS = 1
-    RATE = 44100
+    RATE = 16000
     CHUNK = 1024  
-    FORMAT = pyaudio.paInt16  
+
     try:
-        stream = p.open(format=FORMAT,
-                        channels=CHANNELS,
-                        rate=RATE,
-                        input=True,
-                        input_device_index=INPUT_DEVICE_INDEX,
-                        frames_per_buffer=CHUNK)
-
-        frames = []  
-        for _ in range(0, int(RATE / CHUNK * duration)):
-            data = stream.read(CHUNK)
-            frames.append(data)
-
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
+        recording = sd.rec(int(duration * RATE), samplerate=RATE, channels=CHANNELS, dtype='int16', device=INPUT_DEVICE_INDEX)
+        sd.wait()
 
         with wave.open(filename, "wb") as wf:
             wf.setnchannels(CHANNELS)
-            wf.setsampwidth(p.get_sample_size(FORMAT))
+            wf.setsampwidth(2)
             wf.setframerate(RATE)
-            wf.writeframes(b''.join(frames))
+            wf.writeframes(recording.tobytes())
 
     except Exception as e:
         print(f"Error recording audio: {e}")
