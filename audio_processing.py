@@ -9,7 +9,6 @@ def record_audio(filename="output.wav", duration=4):
     p = pyaudio.PyAudio()  
     INPUT_DEVICE_INDEX = 0
 
-    input_device = p.get_device_info_by_index(INPUT_DEVICE_INDEX)
     CHANNELS = 1
     RATE = 44100
     CHUNK = 1024  
