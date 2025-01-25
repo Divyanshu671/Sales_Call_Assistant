@@ -3,14 +3,15 @@ import wave
 import whisper
 from pydub import AudioSegment
 
-whisper_model = whisper.load_model("base")
+whisper_model = whisper.load_model("turbo")
 
 def record_audio(filename="output.wav", duration=4):
     INPUT_DEVICE_INDEX = 0
     CHANNELS = 1
     RATE = 16000
     CHUNK = 1024  
-
+    devices = sd.query_devices()
+    print(devices)
     try:
         recording = sd.rec(int(duration * RATE), samplerate=RATE, channels=CHANNELS, dtype='int16', device=INPUT_DEVICE_INDEX)
         sd.wait()
