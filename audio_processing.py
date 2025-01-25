@@ -10,8 +10,8 @@ def record_audio(filename="output.wav", duration=4):
     INPUT_DEVICE_INDEX = 0
 
     input_device = p.get_device_info_by_index(INPUT_DEVICE_INDEX)
-    CHANNELS = input_device['maxInputChannels']
-    RATE = int(input_device['defaultSampleRate']) 
+    CHANNELS = 2
+    RATE = 44100
     CHUNK = 1024  
     FORMAT = pyaudio.paInt16  
     try:
