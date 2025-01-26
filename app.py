@@ -5,15 +5,27 @@ from storing_conversations import store_response
 from crmd_system import workflow, summary
 import pandas as pd
 import numpy as np
+import sounddevice as sd
 from openpyxl import load_workbook
 from pathlib import Path
 import base64
-import time
-import warnings
 import plotly.graph_objects as go
+import plotly.io as pio
+import tempfile
+from fpdf import FPDF
+from io import BytesIO
+import os
+import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
+devices=sd.query_devices()
+if not len(devices):
+    st.error("No Available device!!!")
+st.markdown("<h1 class='title'>AI Sales Call Assistant</h1>", unsafe_allow_html=True)
+st.markdown("<p class='subtitle'>Your AI-powered assistant for smarter sales</p>", unsafe_allow_html=True)
 
-# Styling
+# Display the status to the user
+
+
 st.markdown(
     """
     <style>
@@ -150,8 +162,6 @@ if Path(MOBILE_LOGO_PATH).is_file() or not Path(LAPTOP_LOGO_PATH).is_file():
 st.sidebar.title("Features")
 menu = st.sidebar.radio("Go to", ["Home", "Dashboard"])
 
-st.markdown("<h1 class='title'>AI Sales Call Assistant</h1>", unsafe_allow_html=True)
-st.markdown("<p class='subtitle'>Your AI-powered assistant for smarter sales</p>", unsafe_allow_html=True)
 
 # Processing
 if "recording_flag" not in st.session_state:
@@ -187,25 +197,20 @@ def process_audio_and_analyze():
         except Exception as e:
             st.write(e)
             break
-        time.sleep(.1)
 
 def plot_sentiment_data():
     if "conversation_history_df" in st.session_state and not st.session_state.conversation_history_df.empty:
         data = st.session_state.conversation_history_df
 
-        # Map sentiments to numeric values
-        sentiment_map = {"Positive": 1, "Neutral": 0.5, "Negative": -1, "Energetic": 1, "Moderate": 0.5, "Calm": -1}
+        sentiment_map = {"Positive": 1, "Neutral": 0, "Negative": -1, "Energetic": 1, "Moderate": 0, "Calm": -1}
         data["Tone Sentiment (Numeric)"] = data["Tone Sentiment"].map(sentiment_map)
         data["Text Sentiment (Numeric)"] = data["Text Sentiment"].map(sentiment_map)
 
-        # Check if there are valid sentiment values to plot
         if data[["Tone Sentiment (Numeric)", "Text Sentiment (Numeric)"]].isnull().all().all():
             st.info("No valid sentiment data available for plotting.")
         else:
-            # Create the line chart
             fig = go.Figure()
 
-            # Add Text Sentiment Line
             fig.add_trace(go.Scatter(
                 x=data["Index"].astype(str),
                 y=data["Text Sentiment (Numeric)"],
@@ -215,7 +220,6 @@ def plot_sentiment_data():
                 marker=dict(size=8, symbol="circle", color='rgba(52, 152, 219, 1)')
             ))
 
-            # Add Tone Sentiment Line
             fig.add_trace(go.Scatter(
                 x=data["Index"].astype(str),
                 y=data["Tone Sentiment (Numeric)"],
@@ -225,7 +229,6 @@ def plot_sentiment_data():
                 marker=dict(size=8, symbol="square", color='rgba(230, 126, 34, 1)')
             ))
 
-            # Update layout for dark theme and styling
             fig.update_layout(
                 title="Sentiment Analysis - Line Chart",
                 title_font=dict(family="Segoe UI, sans-serif", size=24, color="white"),
@@ -245,18 +248,17 @@ def plot_sentiment_data():
                     title_font=dict(family="Segoe UI, sans-serif", size=18, color='white'),
                     tickfont=dict(family="Segoe UI, sans-serif", size=14, color='white')
                 ),
-                plot_bgcolor='rgb(32, 32, 32)',  # Dark background
-                paper_bgcolor='rgb(32, 32, 32)',  # Dark background
+                plot_bgcolor='rgb(32, 32, 32)',
+                paper_bgcolor='rgb(32, 32, 32)',
                 legend=dict(
                     x=0.8, y=1, traceorder='normal',
                     font=dict(family="Segoe UI, sans-serif", size=14, color='white'),
                     bgcolor='rgba(0, 0, 0, 0.5)', bordercolor='white', borderwidth=1
                 ),
-                margin=dict(l=50, r=50, t=50, b=50)  # Adjust margins
+                margin=dict(l=50, r=50, t=50, b=50)
             )
 
-            # Display the chart in Streamlit
-            st.plotly_chart(fig)
+            return fig
 
     else:
         st.info("No conversation history available to plot.")
@@ -282,8 +284,7 @@ def plot_process_usage():
         xaxis=dict(showgrid=False, zeroline=False),
         yaxis=dict(showgrid=False, zeroline=False)
     )
-
-    st.plotly_chart(fig)
+    return fig
 
 def load_conversation_data():
     try:
@@ -316,62 +317,170 @@ def display_sentiment_shifts():
         
         sentiment_df = sentiment_df.style.applymap(color_sentiment, subset=['Text Sentiment', 'Tone Sentiment'])
         
-        st.dataframe(sentiment_df, use_container_width=True)
+        return sentiment_df
+
+def generate_pdf():
+    try:
+        pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+
+        pdf.set_font("Arial", style="B", size=16)
+        pdf.cell(200, 10, txt="Dashboard Summary", ln=True, align="C")
+        pdf.ln(10)
+
+        pdf.set_font("Arial", size=12)
+        pdf.multi_cell(0, 10, summary())
+
+        pdf.add_page()
+        pdf.set_font("Arial", style="B", size=14)
+        pdf.cell(200, 10, txt="Sentiment Shifts Table", ln=True, align="C")
+        pdf.ln(10)
+        sentiment_df = display_sentiment_shifts()
+        if isinstance(sentiment_df, pd.io.formats.style.Styler):
+            sentiment_df = sentiment_df.data
+
+        pdf.set_font("Arial", "B", 12) 
+        pdf.cell(70, 10, "Message", border=1, align="C")
+        pdf.cell(40, 10, "Text Sentiment", border=1, align="C")
+        pdf.cell(40, 10, "Tone Sentiment", border=1, align="C")
+        pdf.ln() 
+
+        
+        pdf.set_font("Arial", "", 12)
+
+        
+        for _, row in sentiment_df.iterrows():
+            message = row['Message'][:50] + "..." if len(row['Message']) > 50 else row['Message']  # Truncate long messages
+            pdf.cell(70, 10, message, border=1)
+            pdf.cell(40, 10, row['Text Sentiment'], border=1, align="C")  # Text Sentiment column
+            pdf.cell(40, 10, row['Tone Sentiment'], border=1, align="C")  # Tone Sentiment column
+            pdf.ln()
+        
+        temp_files = []
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_image_file1, \
+                 tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_image_file2:
+                
+                sentiment_data_image = pio.to_image(plot_sentiment_data(), format="png")
+                temp_image_file1.write(sentiment_data_image)
+                temp_files.append(temp_image_file1.name)
+                
+                process_usage_image = pio.to_image(plot_process_usage(), format="png")
+                temp_image_file2.write(process_usage_image)
+                temp_files.append(temp_image_file2.name)
+
+            pdf.add_page()
+            pdf.set_font("Arial", style="B", size=14)
+            pdf.cell(200, 10, txt="Sentiment Analysis Chart", ln=True, align="C")
+            pdf.ln(10)
+            pdf.image(temp_files[0], x=10, y=None, w=190)
+
+            pdf.add_page()
+            pdf.set_font("Arial", style="B", size=14)
+            pdf.cell(200, 10, txt="Process Usage Breakdown", ln=True, align="C")
+            pdf.ln(10)
+            pdf.image(temp_files[1], x=10, y=None, w=190)
+
+        finally:
+            for temp_file in temp_files:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+
+
+
+        pdf_buffer = BytesIO()
+        
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf_file:
+            temp_pdf_path = temp_pdf_file.name  
+            pdf.output(temp_pdf_path)
+            
+        with open(temp_pdf_path, "rb") as f:
+            pdf_buffer.write(f.read())
+
+        pdf_buffer.seek(0) 
+        
+        os.remove(temp_pdf_path)
+
+        return pdf_buffer.getvalue()
+
+    except Exception as e:
+        st.error(f"Error while generating PDF: {e}")
+        return None
 
 ###############################################################################################################################
 
 if menu == "Home":
-    st.markdown("#### Ask about products by telling me")
-    
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        if st.button("Say it >"):
-            st.info("Recording... ")
-            st.session_state.recording_flag = True
-            process_audio_and_analyze()
-    with col2:
-        if st.button("Stop"):
-            st.session_state.recording_flag = False
-            st.info("Recording Stopped!")
-    if len(st.session_state.conversation_history_df):
-        combined_content = f"""<div class='curved-box scrollable-box'>"""
-        st.markdown("<h3 class='subtitle'>AI Assistant:</h3>", unsafe_allow_html= True)
-        for i, row in st.session_state.conversation_history_df.iterrows():
-            content = f"""<div class='curved-box scrollable-box'>
-                Query:{row["Message"]}
-                \nText Sentiment:{row['Text Sentiment']}
-                \nTone Sentiment:{row['Tone Sentiment']}
-                \nRecommendation:{row['recommendation']}
-                <div class='output-text'>Response:{row['response']}</div>
-            </div>"""
-            combined_content+=content
-        combined_content += """</div>"""
-        st.markdown(combined_content,unsafe_allow_html=True)
+    if len(devices):
+        st.markdown("#### Ask about products by telling me")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            if st.button("Say it to me 🎤"):
+                st.info("Recording... ")
+                st.session_state.recording_flag = True
+                process_audio_and_analyze()
+        with col2:
+            if st.button("Stop"):
+                st.session_state.recording_flag = False
+                st.info("Recording Stopped!")
+        if len(st.session_state.conversation_history_df):
+            combined_content = f"""<div class='curved-box scrollable-box'>"""
+            st.markdown("<h3 class='subtitle'>AI Assistant:</h3>", unsafe_allow_html= True)
+            for i, row in st.session_state.conversation_history_df.iterrows():
+                content = f"""<div class='curved-box scrollable-box'>
+                    Query:{row["Message"]}
+                    \nText Sentiment:{row['Text Sentiment']}
+                    \nTone Sentiment:{row['Tone Sentiment']}
+                    \nRecommendation:{row['recommendation']}
+                    <div class='output-text'>Response:{row['response']}</div>
+                </div>"""
+                combined_content+=content
+            combined_content += """</div>"""
+            st.markdown(combined_content,unsafe_allow_html=True)
 elif menu == "Dashboard":
-    st.markdown("<h3 class='subtitle'>Summary:</h3>", unsafe_allow_html= True)
+    st.markdown("<h3 class='subtitle'>Summary</h3>", unsafe_allow_html= True)
     if not len(st.session_state.conversation_history_df):
         st.info("No Coversation History Found.")
     else:
-        if st.button("Delete Conversations"):
-            try:
-                history_file = Path("Conversation_data.xlsx")
-                if history_file.is_file():
-                    workbook = load_workbook(history_file)
-                    sheet = workbook.active
-                    
-                    sheet.delete_rows(2, sheet.max_row + 1)  
-                    workbook.save(history_file)  
-                    workbook.close()
-                    
-                    st.success("All conversations deleted successfully!")
-                    st.session_state.conversation_history_df = pd.DataFrame(columns=["Message", "Text Sentiment", "Tone Sentiment", "recommendation", "response"])
-                else:
-                    st.info("No file found to delete.")
-            except Exception as e:
-                st.error(f"Error while deleting conversations: {e}")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            if st.button("Delete Conversations"):
+                try:
+                    history_file = Path("Conversation_data.xlsx")
+                    if history_file.is_file():
+                        workbook = load_workbook(history_file)
+                        sheet = workbook.active
+                        
+                        sheet.delete_rows(2, sheet.max_row + 1)  
+                        workbook.save(history_file)  
+                        workbook.close()
+                        
+                        st.success("All conversations deleted successfully!")
+                        st.session_state.conversation_history_df = pd.DataFrame(columns=["Message", "Text Sentiment", "Tone Sentiment", "recommendation", "response"])
+                    else:
+                        st.info("No file found to delete.")
+                except Exception as e:
+                    st.error(f"Error while deleting conversations: {e}")
+            
+        with col2:
+            pdf_file = generate_pdf()
+            if pdf_file:
+                st.download_button(
+                    label="📥 Download PDF",
+                    data=pdf_file,
+                    file_name="dashboard_report.pdf",
+                    mime="application/pdf",
+                )
         
         # with st.expander("View Full summary", expanded=True):
-        st.markdown(f"""<div class='curved-box'>{summary()}</div>""",unsafe_allow_html=True)
-        plot_sentiment_data()
-        display_sentiment_shifts()
-        plot_process_usage()
+        summary = summary()
+        sentiment_df = display_sentiment_shifts()
+        sentiment_data = plot_sentiment_data()
+        process_usage = plot_process_usage()
+
+        st.markdown(f"""<div class='curved-box'>{summary}</div>""",unsafe_allow_html=True)
+        st.plotly_chart(sentiment_data)
+        st.markdown("### Data Metrics")
+        st.dataframe(sentiment_df, use_container_width=True)
+        st.plotly_chart(process_usage)
