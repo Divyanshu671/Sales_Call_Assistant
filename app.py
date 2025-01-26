@@ -10,18 +10,28 @@ from openpyxl import load_workbook
 from pathlib import Path
 import base64
 import plotly.graph_objects as go
+<<<<<<< HEAD
 import plotly.io as pio
 import tempfile
 from fpdf import FPDF
 from io import BytesIO
 import os
+=======
+>>>>>>> 8a918479beee3500e81f289971fd2b3235d5a9d0
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 devices=sd.query_devices()
 if not len(devices):
+<<<<<<< HEAD
     st.error("No Available device!!!")
 st.markdown("<h1 class='title'>AI Sales Call Assistant</h1>", unsafe_allow_html=True)
 st.markdown("<p class='subtitle'>Your AI-powered assistant for smarter sales</p>", unsafe_allow_html=True)
+=======
+    st.error("No Available device for Recording!!!")
+
+
+
+>>>>>>> 8a918479beee3500e81f289971fd2b3235d5a9d0
 
 # Display the status to the user
 
@@ -258,7 +268,11 @@ def plot_sentiment_data():
                 margin=dict(l=50, r=50, t=50, b=50)
             )
 
+<<<<<<< HEAD
             return fig
+=======
+            st.plotly_chart(fig)
+>>>>>>> 8a918479beee3500e81f289971fd2b3235d5a9d0
 
     else:
         st.info("No conversation history available to plot.")
@@ -412,6 +426,7 @@ def generate_pdf():
 ###############################################################################################################################
 
 if menu == "Home":
+<<<<<<< HEAD
     if len(devices):
         st.markdown("#### Ask about products by telling me")
         col1, col2 = st.columns([1, 1])
@@ -438,6 +453,33 @@ if menu == "Home":
                 combined_content+=content
             combined_content += """</div>"""
             st.markdown(combined_content,unsafe_allow_html=True)
+=======
+    st.markdown("#### Ask about products by telling me")
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("Say it to me 🎤"):
+            st.info("Recording... ")
+            st.session_state.recording_flag = True
+            process_audio_and_analyze()
+    with col2:
+        if st.button("Stop"):
+            st.session_state.recording_flag = False
+            st.info("Recording Stopped!")
+    if len(st.session_state.conversation_history_df):
+        combined_content = f"""<div class='curved-box scrollable-box'>"""
+        st.markdown("<h3 class='subtitle'>AI Assistant:</h3>", unsafe_allow_html= True)
+        for i, row in st.session_state.conversation_history_df.iterrows():
+            content = f"""<div class='curved-box scrollable-box'>
+                Query:{row["Message"]}
+                \nText Sentiment:{row['Text Sentiment']}
+                \nTone Sentiment:{row['Tone Sentiment']}
+                \nRecommendation:{row['recommendation']}
+                <div class='output-text'>Response:{row['response']}</div>
+            </div>"""
+            combined_content+=content
+        combined_content += """</div>"""
+        st.markdown(combined_content,unsafe_allow_html=True)
+>>>>>>> 8a918479beee3500e81f289971fd2b3235d5a9d0
 elif menu == "Dashboard":
     st.markdown("<h3 class='subtitle'>Summary</h3>", unsafe_allow_html= True)
     if not len(st.session_state.conversation_history_df):
