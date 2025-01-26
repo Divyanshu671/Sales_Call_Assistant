@@ -14,8 +14,8 @@ import warnings
 import plotly.graph_objects as go
 warnings.filterwarnings("ignore", category=UserWarning)
 devices=sd.query_devices()
-if devices=='':
-    st.error("No devices is available!!!")
+if len(devices)==0:
+    st.error("No Available device!!!")
 # Styling
 st.markdown(
     """
