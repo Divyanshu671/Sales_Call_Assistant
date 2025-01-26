@@ -9,14 +9,19 @@ import sounddevice as sd
 from openpyxl import load_workbook
 from pathlib import Path
 import base64
-import time
-import warnings
 import plotly.graph_objects as go
+import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 devices=sd.query_devices()
-if len(devices)==0:
+if not len(devices):
     st.error("No Available device!!!")
-# Styling
+
+
+
+
+# Display the status to the user
+
+
 st.markdown(
     """
     <style>
@@ -190,25 +195,20 @@ def process_audio_and_analyze():
         except Exception as e:
             st.write(e)
             break
-        time.sleep(.1)
 
 def plot_sentiment_data():
     if "conversation_history_df" in st.session_state and not st.session_state.conversation_history_df.empty:
         data = st.session_state.conversation_history_df
 
-        # Map sentiments to numeric values
-        sentiment_map = {"Positive": 1, "Neutral": 0.5, "Negative": -1, "Energetic": 1, "Moderate": 0.5, "Calm": -1}
+        sentiment_map = {"Positive": 1, "Neutral": 0, "Negative": -1, "Energetic": 1, "Moderate": 0, "Calm": -1}
         data["Tone Sentiment (Numeric)"] = data["Tone Sentiment"].map(sentiment_map)
         data["Text Sentiment (Numeric)"] = data["Text Sentiment"].map(sentiment_map)
 
-        # Check if there are valid sentiment values to plot
         if data[["Tone Sentiment (Numeric)", "Text Sentiment (Numeric)"]].isnull().all().all():
             st.info("No valid sentiment data available for plotting.")
         else:
-            # Create the line chart
             fig = go.Figure()
 
-            # Add Text Sentiment Line
             fig.add_trace(go.Scatter(
                 x=data["Index"].astype(str),
                 y=data["Text Sentiment (Numeric)"],
@@ -218,7 +218,6 @@ def plot_sentiment_data():
                 marker=dict(size=8, symbol="circle", color='rgba(52, 152, 219, 1)')
             ))
 
-            # Add Tone Sentiment Line
             fig.add_trace(go.Scatter(
                 x=data["Index"].astype(str),
                 y=data["Tone Sentiment (Numeric)"],
@@ -228,7 +227,6 @@ def plot_sentiment_data():
                 marker=dict(size=8, symbol="square", color='rgba(230, 126, 34, 1)')
             ))
 
-            # Update layout for dark theme and styling
             fig.update_layout(
                 title="Sentiment Analysis - Line Chart",
                 title_font=dict(family="Segoe UI, sans-serif", size=24, color="white"),
@@ -248,17 +246,16 @@ def plot_sentiment_data():
                     title_font=dict(family="Segoe UI, sans-serif", size=18, color='white'),
                     tickfont=dict(family="Segoe UI, sans-serif", size=14, color='white')
                 ),
-                plot_bgcolor='rgb(32, 32, 32)',  # Dark background
-                paper_bgcolor='rgb(32, 32, 32)',  # Dark background
+                plot_bgcolor='rgb(32, 32, 32)',
+                paper_bgcolor='rgb(32, 32, 32)',
                 legend=dict(
                     x=0.8, y=1, traceorder='normal',
                     font=dict(family="Segoe UI, sans-serif", size=14, color='white'),
                     bgcolor='rgba(0, 0, 0, 0.5)', bordercolor='white', borderwidth=1
                 ),
-                margin=dict(l=50, r=50, t=50, b=50)  # Adjust margins
+                margin=dict(l=50, r=50, t=50, b=50)
             )
 
-            # Display the chart in Streamlit
             st.plotly_chart(fig)
 
     else:
@@ -324,32 +321,32 @@ def display_sentiment_shifts():
 ###############################################################################################################################
 
 if menu == "Home":
-    st.markdown("#### Ask about products by telling me")
-    
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        if st.button("Say it >"):
-            st.info("Recording... ")
-            st.session_state.recording_flag = True
-            process_audio_and_analyze()
-    with col2:
-        if st.button("Stop"):
-            st.session_state.recording_flag = False
-            st.info("Recording Stopped!")
-    if len(st.session_state.conversation_history_df):
-        combined_content = f"""<div class='curved-box scrollable-box'>"""
-        st.markdown("<h3 class='subtitle'>AI Assistant:</h3>", unsafe_allow_html= True)
-        for i, row in st.session_state.conversation_history_df.iterrows():
-            content = f"""<div class='curved-box scrollable-box'>
-                Query:{row["Message"]}
-                \nText Sentiment:{row['Text Sentiment']}
-                \nTone Sentiment:{row['Tone Sentiment']}
-                \nRecommendation:{row['recommendation']}
-                <div class='output-text'>Response:{row['response']}</div>
-            </div>"""
-            combined_content+=content
-        combined_content += """</div>"""
-        st.markdown(combined_content,unsafe_allow_html=True)
+    if len(devices):
+        st.markdown("#### Ask about products by telling me")
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            if st.button("Say it to me 🎤"):
+                st.info("Recording... ")
+                st.session_state.recording_flag = True
+                process_audio_and_analyze()
+        with col2:
+            if st.button("Stop"):
+                st.session_state.recording_flag = False
+                st.info("Recording Stopped!")
+        if len(st.session_state.conversation_history_df):
+            combined_content = f"""<div class='curved-box scrollable-box'>"""
+            st.markdown("<h3 class='subtitle'>AI Assistant:</h3>", unsafe_allow_html= True)
+            for i, row in st.session_state.conversation_history_df.iterrows():
+                content = f"""<div class='curved-box scrollable-box'>
+                    Query:{row["Message"]}
+                    \nText Sentiment:{row['Text Sentiment']}
+                    \nTone Sentiment:{row['Tone Sentiment']}
+                    \nRecommendation:{row['recommendation']}
+                    <div class='output-text'>Response:{row['response']}</div>
+                </div>"""
+                combined_content+=content
+            combined_content += """</div>"""
+            st.markdown(combined_content,unsafe_allow_html=True)
 elif menu == "Dashboard":
     st.markdown("<h3 class='subtitle'>Summary:</h3>", unsafe_allow_html= True)
     if not len(st.session_state.conversation_history_df):
