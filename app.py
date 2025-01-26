@@ -14,7 +14,7 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 devices=sd.query_devices()
 if not len(devices):
-    st.error("No Available device are Found!!!")
+    st.error("No Available device for Recording!!!")
 
 
 
