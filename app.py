@@ -10,28 +10,18 @@ from openpyxl import load_workbook
 from pathlib import Path
 import base64
 import plotly.graph_objects as go
-<<<<<<< HEAD
 import plotly.io as pio
 import tempfile
 from fpdf import FPDF
 from io import BytesIO
 import os
-=======
->>>>>>> 8a918479beee3500e81f289971fd2b3235d5a9d0
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 devices=sd.query_devices()
 if not len(devices):
-<<<<<<< HEAD
-    st.error("No Available device!!!")
+    st.error("No Available device for Recording!!!")
 st.markdown("<h1 class='title'>AI Sales Call Assistant</h1>", unsafe_allow_html=True)
 st.markdown("<p class='subtitle'>Your AI-powered assistant for smarter sales</p>", unsafe_allow_html=True)
-=======
-    st.error("No Available device for Recording!!!")
-
-
-
->>>>>>> 8a918479beee3500e81f289971fd2b3235d5a9d0
 
 # Display the status to the user
 
