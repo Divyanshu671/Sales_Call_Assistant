@@ -5,6 +5,7 @@ from storing_conversations import store_response
 from crmd_system import workflow, summary
 import pandas as pd
 import numpy as np
+import sounddevice as sd
 from openpyxl import load_workbook
 from pathlib import Path
 import base64
@@ -12,7 +13,9 @@ import time
 import warnings
 import plotly.graph_objects as go
 warnings.filterwarnings("ignore", category=UserWarning)
-
+devices=sd.query_devices()
+if devices=='':
+    st.error("No devices is available!!!")
 # Styling
 st.markdown(
     """
