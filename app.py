@@ -14,7 +14,7 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 devices=sd.query_devices()
 if not len(devices):
-    st.error("No Available device!!!")
+    st.error("No Available device are Found!!!")
 
 
 
@@ -321,32 +321,31 @@ def display_sentiment_shifts():
 ###############################################################################################################################
 
 if menu == "Home":
-    if len(devices):
-        st.markdown("#### Ask about products by telling me")
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            if st.button("Say it to me 🎤"):
-                st.info("Recording... ")
-                st.session_state.recording_flag = True
-                process_audio_and_analyze()
-        with col2:
-            if st.button("Stop"):
-                st.session_state.recording_flag = False
-                st.info("Recording Stopped!")
-        if len(st.session_state.conversation_history_df):
-            combined_content = f"""<div class='curved-box scrollable-box'>"""
-            st.markdown("<h3 class='subtitle'>AI Assistant:</h3>", unsafe_allow_html= True)
-            for i, row in st.session_state.conversation_history_df.iterrows():
-                content = f"""<div class='curved-box scrollable-box'>
-                    Query:{row["Message"]}
-                    \nText Sentiment:{row['Text Sentiment']}
-                    \nTone Sentiment:{row['Tone Sentiment']}
-                    \nRecommendation:{row['recommendation']}
-                    <div class='output-text'>Response:{row['response']}</div>
-                </div>"""
-                combined_content+=content
-            combined_content += """</div>"""
-            st.markdown(combined_content,unsafe_allow_html=True)
+    st.markdown("#### Ask about products by telling me")
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("Say it to me 🎤"):
+            st.info("Recording... ")
+            st.session_state.recording_flag = True
+            process_audio_and_analyze()
+    with col2:
+        if st.button("Stop"):
+            st.session_state.recording_flag = False
+            st.info("Recording Stopped!")
+    if len(st.session_state.conversation_history_df):
+        combined_content = f"""<div class='curved-box scrollable-box'>"""
+        st.markdown("<h3 class='subtitle'>AI Assistant:</h3>", unsafe_allow_html= True)
+        for i, row in st.session_state.conversation_history_df.iterrows():
+            content = f"""<div class='curved-box scrollable-box'>
+                Query:{row["Message"]}
+                \nText Sentiment:{row['Text Sentiment']}
+                \nTone Sentiment:{row['Tone Sentiment']}
+                \nRecommendation:{row['recommendation']}
+                <div class='output-text'>Response:{row['response']}</div>
+            </div>"""
+            combined_content+=content
+        combined_content += """</div>"""
+        st.markdown(combined_content,unsafe_allow_html=True)
 elif menu == "Dashboard":
     st.markdown("<h3 class='subtitle'>Summary:</h3>", unsafe_allow_html= True)
     if not len(st.session_state.conversation_history_df):
