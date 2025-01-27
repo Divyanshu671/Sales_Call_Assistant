@@ -258,11 +258,7 @@ def plot_sentiment_data():
                 margin=dict(l=50, r=50, t=50, b=50)
             )
 
-<<<<<<< HEAD
             return fig
-=======
-            st.plotly_chart(fig)
->>>>>>> 8a918479beee3500e81f289971fd2b3235d5a9d0
 
     else:
         st.info("No conversation history available to plot.")
@@ -416,7 +412,6 @@ def generate_pdf():
 ###############################################################################################################################
 
 if menu == "Home":
-<<<<<<< HEAD
     if len(devices):
         st.markdown("#### Ask about products by telling me")
         col1, col2 = st.columns([1, 1])
@@ -443,7 +438,7 @@ if menu == "Home":
                 combined_content+=content
             combined_content += """</div>"""
             st.markdown(combined_content,unsafe_allow_html=True)
-=======
+
     st.markdown("#### Ask about products by telling me")
     col1, col2 = st.columns([1, 1])
     with col1:
@@ -469,7 +464,6 @@ if menu == "Home":
             combined_content+=content
         combined_content += """</div>"""
         st.markdown(combined_content,unsafe_allow_html=True)
->>>>>>> 8a918479beee3500e81f289971fd2b3235d5a9d0
 elif menu == "Dashboard":
     st.markdown("<h3 class='subtitle'>Summary</h3>", unsafe_allow_html= True)
     if not len(st.session_state.conversation_history_df):
