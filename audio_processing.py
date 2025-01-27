@@ -4,21 +4,18 @@ import whisper
 from pydub import AudioSegment
 import streamlit as st
 
-whisper_model = whisper.load_model("turbo")
+@st.cache_resource
+def load_whisper_model():
+    return whisper.load_model("turbo")
+
+whisper_model = load_whisper_model()
 
 def record_audio(filename="output.wav", duration=4):
-    INPUT_DEVICE_INDEX = 0
+    CHANNELS = 1
+    RATE = 16000  
 
-    input_device = p.get_device_info_by_index(INPUT_DEVICE_INDEX)
-    CHANNELS = 1
-    RATE = 44100
-    CHANNELS = 1
-    RATE = 16000
-    CHUNK = 1024  
-    devices = sd.query_devices()
-    st.write(devices)
     try:
-        recording = sd.rec(int(duration * RATE), samplerate=RATE, channels=CHANNELS, dtype='int16', device=INPUT_DEVICE_INDEX)
+        recording = sd.rec(int(duration * RATE), samplerate=RATE, channels=CHANNELS, dtype='int16')
         sd.wait()
 
         with wave.open(filename, "wb") as wf:
@@ -28,8 +25,7 @@ def record_audio(filename="output.wav", duration=4):
             wf.writeframes(recording.tobytes())
 
     except Exception as e:
-        print(f"Error recording audio: {e}")
-
+        raise(f"Error recording audio: {e}")
 def transcribe_audio(audio="output.wav"):
     try:
         import os
