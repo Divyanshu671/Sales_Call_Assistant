@@ -465,7 +465,6 @@ if menu == "Home":
             combined_content+=content
         combined_content += """</div>"""
         st.markdown(combined_content,unsafe_allow_html=True)
->>>>>>> 8a918479beee3500e81f289971fd2b3235d5a9d0
 elif menu == "Dashboard":
     st.markdown("<h3 class='subtitle'>Summary</h3>", unsafe_allow_html= True)
     if not len(st.session_state.conversation_history_df):
