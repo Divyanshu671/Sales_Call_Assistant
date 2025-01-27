@@ -258,11 +258,7 @@ def plot_sentiment_data():
                 margin=dict(l=50, r=50, t=50, b=50)
             )
 
-<<<<<<< HEAD
             return fig
-=======
-            st.plotly_chart(fig)
->>>>>>> 8a918479beee3500e81f289971fd2b3235d5a9d0
 
     else:
         st.info("No conversation history available to plot.")
