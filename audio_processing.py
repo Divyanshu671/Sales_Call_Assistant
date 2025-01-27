@@ -8,15 +8,12 @@ whisper_model = whisper.load_model("turbo")
 
 def record_audio(filename="output.wav", duration=4):
     INPUT_DEVICE_INDEX = 0
-<<<<<<< HEAD
 
     input_device = p.get_device_info_by_index(INPUT_DEVICE_INDEX)
     CHANNELS = 1
     RATE = 44100
-=======
     CHANNELS = 1
     RATE = 16000
->>>>>>> 8a918479beee3500e81f289971fd2b3235d5a9d0
     CHUNK = 1024  
     devices = sd.query_devices()
     st.write(devices)
