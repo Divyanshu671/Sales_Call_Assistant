@@ -5,7 +5,6 @@ from storing_conversations import store_response
 from crmd_system import workflow, summary
 import pandas as pd
 import numpy as np
-import sounddevice as sd
 from openpyxl import load_workbook
 from pathlib import Path
 import base64
@@ -17,13 +16,44 @@ from io import BytesIO
 import os
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
-devices=sd.query_devices()
-if not len(devices):
-    st.error("No Available device for Recording!!!")
-st.markdown("<h1 class='title'>AI Sales Call Assistant</h1>", unsafe_allow_html=True)
-st.markdown("<p class='subtitle'>Your AI-powered assistant for smarter sales</p>", unsafe_allow_html=True)
+html_code = """
+<script>
+async function checkMicrophonePermission() {
+    try {
+        const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+        const statusElement = document.getElementById("status");
 
-# Display the status to the user
+        if (permissionStatus.state === "granted") {
+            statusElement.innerText = "Microphone access is granted ✅";
+            statusElement.style.color = "green";
+        } else if (permissionStatus.state === "prompt") {
+            statusElement.innerText = "Microphone access is not decided yet (Prompt required) ⚠️";
+            statusElement.style.color = "orange";
+        } else if (permissionStatus.state === "denied") {
+            statusElement.innerText = "Microphone access is denied ❌";
+            statusElement.style.color = "red";
+        }
+
+        permissionStatus.onchange = () => {
+            checkMicrophonePermission(); // Re-check if the permission state changes
+        };
+    } catch (error) {
+        const statusElement = document.getElementById("status");
+        statusElement.innerText = "Error: Unable to check microphone permissions. " + error;
+        statusElement.style.color = "red";
+    }
+}
+checkMicrophonePermission();
+</script>
+
+<div>
+    <h3>Microphone Permission Status</h3>
+    <p id="status">Checking microphone permission...</p>
+</div>
+"""
+
+# Embed the JavaScript in Streamlit
+st.components.v1.html(html_code, height=150)
 
 
 st.markdown(
@@ -176,6 +206,8 @@ if "index" not in st.session_state:
 
 history_file = Path("Conversation_data.xlsx")
 st.session_state.conversation_history_df = pd.read_excel(history_file, engine='openpyxl')
+st.markdown("<h1 class='title'>AI Sales Call Assistant</h1>", unsafe_allow_html=True)
+st.markdown("<p class='subtitle'>Your AI-powered assistant for smarter sales</p>", unsafe_allow_html=True)
 
 def process_audio_and_analyze():
     st.session_state.index+=1
@@ -387,8 +419,6 @@ def generate_pdf():
             for temp_file in temp_files:
                 if os.path.exists(temp_file):
                     os.remove(temp_file)
-
-
 
         pdf_buffer = BytesIO()
         
