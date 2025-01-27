@@ -25,7 +25,7 @@ def record_audio(filename="output.wav", duration=4):
             wf.writeframes(recording.tobytes())
 
     except Exception as e:
-        raise(f"Error recording audio: {e}")
+        raise RuntimeError(f"Error recording audio: {e}")
 def transcribe_audio(audio="output.wav"):
     try:
         import os
