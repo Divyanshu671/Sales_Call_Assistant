@@ -4,10 +4,13 @@ import spacy
 import numpy as np
 from groq import Groq
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 key = os.getenv("GROQ_API_KEY")
-client = Groq(api_key="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")
+client = Groq(api_key=key)
 nlp = spacy.load("en_core_web_md")
-dataset = pd.read_excel("Conversation_data.xlsx")
+dataset = pd.read_excel("data/Conversation_data.xlsx")
 
 
 def load_data():

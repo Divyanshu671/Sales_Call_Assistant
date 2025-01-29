@@ -4,7 +4,7 @@ import pandas as pd
     
 def store_response(transcription,text_sentiment,tone_sentiment,recommendation_response,objection_response):
     try:
-        conversation_data = pd.read_excel("Conversation_data.xlsx")
+        conversation_data = pd.read_excel("data/Conversation_data.xlsx")
         if not conversation_data.empty:
             new_index = conversation_data["Index"].iloc[-1] + 1 
         else:
@@ -22,7 +22,7 @@ def store_response(transcription,text_sentiment,tone_sentiment,recommendation_re
     
     new_data = pd.DataFrame(data)
 
-    file_name = "Conversation_data.xlsx"
+    file_name = "data/Conversation_data.xlsx"
 
     try:
         book = load_workbook(file_name)

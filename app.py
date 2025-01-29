@@ -153,6 +153,8 @@ if Path(MOBILE_LOGO_PATH).is_file() or not Path(LAPTOP_LOGO_PATH).is_file():
 # Sidebar
 st.sidebar.title("Features")
 menu = st.sidebar.radio("Go to", ["Home", "Dashboard"])
+st.markdown("<h1 class='title'>AI Sales Call Assistant</h1>", unsafe_allow_html=True)
+st.markdown("<p class='subtitle'>Your AI-powered assistant for smarter sales</p>", unsafe_allow_html=True)
 
 
 # Processing
@@ -166,10 +168,8 @@ if "index" not in st.session_state:
     st.session_state.index = 0
 
 
-history_file = Path("Conversation_data.xlsx")
+history_file = Path("data/Conversation_data.xlsx")
 st.session_state.conversation_history_df = pd.read_excel(history_file, engine='openpyxl')
-st.markdown("<h1 class='title'>AI Sales Call Assistant</h1>", unsafe_allow_html=True)
-st.markdown("<p class='subtitle'>Your AI-powered assistant for smarter sales</p>", unsafe_allow_html=True)
 
 def process_audio_and_analyze():
     st.session_state.index+=1
@@ -181,7 +181,7 @@ def process_audio_and_analyze():
             with st.spinner("Processing audio..."):
                 transcription = transcribe_audio()
                 transcription = transcription if len(transcription) else "NaN"
-                st.session_state.final_sentiment = sentiment_result = sentiment_analysis("output.wav", transcription)
+                st.session_state.final_sentiment = sentiment_result = sentiment_analysis("data/output.wav", transcription)
                 query = [transcription, sentiment_result["Text"], sentiment_result["Tone"]]
                 response = workflow(query)
                 st.session_state.products = response[0]
@@ -282,7 +282,7 @@ def plot_process_usage():
 
 def load_conversation_data():
     try:
-        history_file = Path("Conversation_data.xlsx")
+        history_file = Path("data/Conversation_data.xlsx")
         if history_file.is_file():
             df = pd.read_excel(history_file)
             return df
@@ -382,6 +382,8 @@ def generate_pdf():
                 if os.path.exists(temp_file):
                     os.remove(temp_file)
 
+
+
         pdf_buffer = BytesIO()
         
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_pdf_file:
@@ -424,7 +426,7 @@ if menu == "Home":
                 \nText Sentiment:{row['Text Sentiment']}
                 \nTone Sentiment:{row['Tone Sentiment']}
                 \nRecommendation:{row['recommendation']}
-                <div class='output-text'>Response:{row['response']}</div>
+                \n<div class='output-text'>Response:{row['response']}</div>
             </div>"""
             combined_content+=content
         combined_content += """</div>"""
@@ -435,10 +437,11 @@ elif menu == "Dashboard":
         st.info("No Coversation History Found.")
     else:
         col1, col2 = st.columns([1, 1])
+        
         with col1:
             if st.button("Delete Conversations"):
                 try:
-                    history_file = Path("Conversation_data.xlsx")
+                    history_file = Path("data/Conversation_data.xlsx")
                     if history_file.is_file():
                         workbook = load_workbook(history_file)
                         sheet = workbook.active

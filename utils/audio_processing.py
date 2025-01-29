@@ -2,15 +2,13 @@ import sounddevice as sd
 import wave
 import whisper
 from pydub import AudioSegment
-import streamlit as st
 
-@st.cache_resource
 def load_whisper_model():
-    return whisper.load_model("turbo")
+    return whisper.load_model("base.en")
 
 whisper_model = load_whisper_model()
 
-def record_audio(filename="output.wav", duration=4):
+def record_audio(filename="data/output.wav", duration=4):
     CHANNELS = 1
     RATE = 16000  
 
@@ -26,7 +24,7 @@ def record_audio(filename="output.wav", duration=4):
 
     except Exception as e:
         raise RuntimeError(f"Error recording audio: {e}")
-def transcribe_audio(audio="output.wav"):
+def transcribe_audio(audio="data/output.wav"):
     try:
         import os
         if not os.path.exists(audio):
