@@ -3,11 +3,11 @@
 Welcome to the **Real Time AI Sales Call Assistant** project! This application is a production recommendation system with the capability to handle objections, generate questions and analyze the conversation for improvement of Sales Calls in real time using advance AI models. Built with streamlit, this tool offers a seamless and interactive user experience.
 
 ## 🚀 Features
-- ** 📊 Real-time voice transcription and analysis**
-- ** 🤖 Dynamic question and objection handling**
-- ** 🔧 Personalized product recommendations**
-- ** 📊 Historical data insights for optimized strategies**
-- ** 🖥️ Easy-to-use interface with Streamlit implementation**
+- **🎙️ Real-time voice transcription and analysis**
+- **🤖 Dynamic question and objection handling**
+- **🔧 Personalized product recommendations**
+- **📊 Historical data insights for optimized strategies**
+- **🖥️ Easy-to-use interface with Streamlit implementation**
 
 ## 🛠️ Installation
 
