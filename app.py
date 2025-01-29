@@ -1,8 +1,8 @@
 import streamlit as st
-from audio_processing import record_audio, transcribe_audio
-from sentiment_analyzing import sentiment_analysis
-from storing_conversations import store_response
-from crmd_system import workflow, summary
+from utils.audio_processing import record_audio, transcribe_audio
+from utils.sentiment_analyzing import sentiment_analysis
+from utils.storing_conversations import store_response
+from utils.crmd_system import workflow, summary
 import pandas as pd
 import numpy as np
 from openpyxl import load_workbook
