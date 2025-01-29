@@ -410,15 +410,13 @@ if menu == "Home":
     col1, col2 = st.columns([1, 1])
     with col1:
         if st.button("Say it to me 🎤"):
-            if not st.session_state.recording_flag:
-                st.info("Recording... ")
-                st.session_state.recording_flag = True
-                process_audio_and_analyze()
+            st.info("Recording... ")
+            st.session_state.recording_flag = True
+            process_audio_and_analyze()
     with col2:
         if st.button("Stop"):
-            if st.session_state.recording_flag:
-                st.session_state.recording_flag = False
-                st.info("Recording Stopped!")
+            st.session_state.recording_flag = False
+            st.info("Recording Stopped!")
     if len(st.session_state.conversation_history_df):
         combined_content = f"""<div class='curved-box scrollable-box'>"""
         st.markdown("<h3 class='subtitle'>AI Assistant:</h3>", unsafe_allow_html= True)
