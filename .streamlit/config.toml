@@ -1,4 +1,0 @@
-[server]
-enableCORS = false
-enableWebsocketCompression = false
-headless = true

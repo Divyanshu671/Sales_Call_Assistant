@@ -16,44 +16,6 @@ from io import BytesIO
 import os
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
-html_code = """
-<script>
-async function checkMicrophonePermission() {
-    try {
-        const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
-        const statusElement = document.getElementById("status");
-
-        if (permissionStatus.state === "granted") {
-            statusElement.innerText = "Microphone access is granted ✅";
-            statusElement.style.color = "green";
-        } else if (permissionStatus.state === "prompt") {
-            statusElement.innerText = "Microphone access is not decided yet (Prompt required) ⚠️";
-            statusElement.style.color = "orange";
-        } else if (permissionStatus.state === "denied") {
-            statusElement.innerText = "Microphone access is denied ❌";
-            statusElement.style.color = "red";
-        }
-
-        permissionStatus.onchange = () => {
-            checkMicrophonePermission(); // Re-check if the permission state changes
-        };
-    } catch (error) {
-        const statusElement = document.getElementById("status");
-        statusElement.innerText = "Error: Unable to check microphone permissions. " + error;
-        statusElement.style.color = "red";
-    }
-}
-checkMicrophonePermission();
-</script>
-
-<div>
-    <h3>Microphone Permission Status</h3>
-    <p id="status">Checking microphone permission...</p>
-</div>
-"""
-
-# Embed the JavaScript in Streamlit
-st.components.v1.html(html_code, height=150)
 
 
 st.markdown(
