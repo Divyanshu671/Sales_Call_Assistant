@@ -7,8 +7,9 @@ import os
 from dotenv import load_dotenv
 import streamlit as st
 
-load_dotenv()
-key = os.getenv("GROQ_API_KEY")
+# load_dotenv()
+# key = os.getenv("GROQ_API_KEY")
+key = st.secrets["GROQ_API_KEY"]
 client = Groq(api_key=key)
 nlp = spacy.load("en_core_web_md")
 dataset = pd.read_excel("data/Conversation_data.xlsx")
