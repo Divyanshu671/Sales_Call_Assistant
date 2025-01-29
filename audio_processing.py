@@ -15,11 +15,7 @@ def record_audio(filename="output.wav", duration=4):
     RATE = 16000  
 
     try:
-        if device_id is None:
-            device_id = sd.default.device[0]  
-        else:
-            sd.default.device = device_id
-        recording = sd.rec(int(duration * RATE), samplerate=RATE, channels=CHANNELS, dtype='int16', device_id=device_id)
+        recording = sd.rec(int(duration * RATE), samplerate=RATE, channels=CHANNELS, dtype='int16')
         sd.wait()
 
         with wave.open(filename, "wb") as wf:
