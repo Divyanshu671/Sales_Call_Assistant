@@ -24,6 +24,7 @@ def record_audio(filename="data/output.wav", duration=4):
 
     except Exception as e:
         raise RuntimeError(f"Error recording audio: {e}")
+
 def transcribe_audio(audio="data/output.wav"):
     try:
         import os

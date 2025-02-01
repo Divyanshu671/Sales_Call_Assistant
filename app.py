@@ -17,7 +17,6 @@ import os
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
-
 st.markdown(
     """
     <style>
@@ -86,7 +85,7 @@ st.markdown(
 
     /* Output text styling */
     .output-text {
-        color: red; /* Vibrant teal for outputs */
+        color: lightgreen; /* Vibrant teal for outputs */
         font-size: 18px;
         font-weight: bold;
     }
@@ -158,39 +157,32 @@ st.markdown("<p class='subtitle'>Your AI-powered assistant for smarter sales</p>
 
 
 # Processing
+if "first" not in st.session_state:
+    st.session_state.first = True
 if "recording_flag" not in st.session_state:
     st.session_state.recording_flag = False
 if "products" not in st.session_state:
     st.session_state.products = {}
+if "products_history" not in st.session_state:
+    st.session_state.products_history = {}
 if "final_sentiment" not in st.session_state:
     st.session_state.final_sentiment = {}
-if "index" not in st.session_state:
-    st.session_state.index = 0
 
 
 history_file = Path("data/Conversation_data.xlsx")
 st.session_state.conversation_history_df = pd.read_excel(history_file, engine='openpyxl')
 
-def process_audio_and_analyze():
-    st.session_state.index+=1
-    while True:
-        if not st.session_state.recording_flag:
-            break
-        try:
-            record_audio()
-            with st.spinner("Processing audio..."):
-                transcription = transcribe_audio()
-                transcription = transcription if len(transcription) else "NaN"
-                st.session_state.final_sentiment = sentiment_result = sentiment_analysis("data/output.wav", transcription)
-                query = [transcription, sentiment_result["Text"], sentiment_result["Tone"]]
-                response = workflow(query)
-                st.session_state.products = response[0]
-                store_response(
-                  [query[0]], [query[1][0]], [query[2]["tone"]], [response[1]], [response[2]]
-                )
-        except Exception as e:
-            st.write(e)
-            break
+
+if len(st.session_state.products):
+    for _, row in st.session_state.products.iterrows():
+        brand = row.get("Brand",row["Company"])
+        product = row.get("Model",row["Product"])
+        key = f"{brand} {product}"
+        if key not in st.session_state.products_history:
+            st.session_state.products_history[key] = 10
+        else:
+            st.session_state.products_history[key] += 10
+    st.session_state.products = {}
 
 def plot_sentiment_data():
     if "conversation_history_df" in st.session_state and not st.session_state.conversation_history_df.empty:
@@ -224,7 +216,7 @@ def plot_sentiment_data():
             ))
 
             fig.update_layout(
-                title="Sentiment Analysis - Line Chart",
+                title="Sentiment Shifts",
                 title_font=dict(family="Segoe UI, sans-serif", size=24, color="white"),
                 xaxis=dict(
                     title="Index",
@@ -313,6 +305,35 @@ def display_sentiment_shifts():
         
         return sentiment_df
 
+def plot_products(products_history=st.session_state.products_history):
+    products = list(products_history.keys())
+    values = list(products_history.values())
+
+    colors = ["#4F6BED", "#3AA0FF", "#8A3FFC", "#0078D4", "#38A9DB"]
+
+    fig = go.Figure(
+        data=[
+            go.Bar(
+                x=products,
+                y=values,
+                marker_color=colors * (len(products) // len(colors) + 1),
+                text=values,
+                textposition='auto'
+            )
+        ]
+    )
+
+    fig.update_layout(
+        plot_bgcolor="#1E1E1E",
+        paper_bgcolor="#1E1E1E",
+        font_color="#FFFFFF",
+        title="Most Recommended",
+        xaxis=dict(title="Products", tickangle=-45),
+        yaxis=dict(title="Recommendation")
+    )
+
+    return fig
+
 def generate_pdf():
     try:
         pdf = FPDF()
@@ -341,17 +362,16 @@ def generate_pdf():
         pdf.cell(40, 10, "Tone Sentiment", border=1, align="C")
         pdf.ln() 
 
-        
         pdf.set_font("Arial", "", 12)
-
         
         for _, row in sentiment_df.iterrows():
-            message = row['Message'][:50] + "..." if len(row['Message']) > 50 else row['Message']  # Truncate long messages
+            message = row['Message'][:50] + "..." if len(row['Message']) > 50 else row['Message'] 
             pdf.cell(70, 10, message, border=1)
-            pdf.cell(40, 10, row['Text Sentiment'], border=1, align="C")  # Text Sentiment column
-            pdf.cell(40, 10, row['Tone Sentiment'], border=1, align="C")  # Tone Sentiment column
+            pdf.cell(40, 10, row['Text Sentiment'], border=1, align="C")  
+            pdf.cell(40, 10, row['Tone Sentiment'], border=1, align="C")  
             pdf.ln()
-        
+
+
         temp_files = []
         try:
             with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_image_file1, \
@@ -381,8 +401,21 @@ def generate_pdf():
             for temp_file in temp_files:
                 if os.path.exists(temp_file):
                     os.remove(temp_file)
+        
 
+        pdf.add_page()
+        pdf.set_font("Arial", style="B", size=14)
+        pdf.cell(200, 10, txt="Most Recommended Products", ln=True, align="C")
+        pdf.ln(10)
 
+        product_plot_image = pio.to_image(plot_products(), format="png")
+        
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_image_file:
+            temp_image_file.write(product_plot_image)
+            temp_image_file_path = temp_image_file.name
+
+        pdf.image(temp_image_file_path, x=10, y=None, w=190)
+        os.remove(temp_image_file_path)
 
         pdf_buffer = BytesIO()
         
@@ -407,7 +440,39 @@ def generate_pdf():
 
 if menu == "Home":
     st.markdown("#### Ask about products by telling me")
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns([2, 1])
+    output_area = st.container()
+
+    def process_audio_and_analyze():
+        while True:
+            if not st.session_state.recording_flag:
+                break
+            try:
+                with st.spinner("I am listening..."):
+                    record_audio()
+                with st.spinner("Processing audio..."):
+                    transcription = transcribe_audio()
+                    transcription = transcription if len(transcription) else "N"
+                    st.session_state.final_sentiment = sentiment_result = sentiment_analysis("data/output.wav", transcription)
+                    query = [transcription, sentiment_result["Text"], sentiment_result["Tone"]]
+                    response = workflow(query)
+                    st.session_state.products = response[0]
+                    store_response(
+                    [query[0]], [query[1][0]], [query[2]["tone"]], [response[1]], [response[2]]
+                    )
+                    content = f"""<div class='curved-box scrollable-box'>
+                        Query:{query[0]}
+                        \nText Sentiment:{query[1][0]}
+                        \nTone Sentiment:{query[2]["tone"]}
+                        \nRecommendation:{response[1]}
+                        \n<div class='output-text'>Response:{response[2]}</div>
+                    </div>"""
+                    with output_area:
+                        st.markdown(content,unsafe_allow_html=True)
+            except Exception as e:
+                st.write(e)
+                break
+    
     with col1:
         if st.button("Say it to me 🎤"):
             st.info("Recording... ")
@@ -417,6 +482,8 @@ if menu == "Home":
         if st.button("Stop"):
             st.session_state.recording_flag = False
             st.info("Recording Stopped!")
+            with output_area:
+                st.empty()
     if len(st.session_state.conversation_history_df):
         combined_content = f"""<div class='curved-box scrollable-box'>"""
         st.markdown("<h3 class='subtitle'>AI Assistant:</h3>", unsafe_allow_html= True)
@@ -431,13 +498,13 @@ if menu == "Home":
             combined_content+=content
         combined_content += """</div>"""
         st.markdown(combined_content,unsafe_allow_html=True)
+
 elif menu == "Dashboard":
-    st.markdown("<h3 class='subtitle'>Summary</h3>", unsafe_allow_html= True)
+    st.markdown("<h2 class='title'>Summary</h2>", unsafe_allow_html= True)
     if not len(st.session_state.conversation_history_df):
         st.info("No Coversation History Found.")
     else:
-        col1, col2 = st.columns([1, 1])
-        
+        col1, col2 = st.columns([2, 1])
         with col1:
             if st.button("Delete Conversations"):
                 try:
@@ -445,7 +512,6 @@ elif menu == "Dashboard":
                     if history_file.is_file():
                         workbook = load_workbook(history_file)
                         sheet = workbook.active
-                        
                         sheet.delete_rows(2, sheet.max_row + 1)  
                         workbook.save(history_file)  
                         workbook.close()
@@ -458,23 +524,31 @@ elif menu == "Dashboard":
                     st.error(f"Error while deleting conversations: {e}")
             
         with col2:
-            pdf_file = generate_pdf()
-            if pdf_file:
-                st.download_button(
-                    label="📥 Download PDF",
-                    data=pdf_file,
-                    file_name="dashboard_report.pdf",
-                    mime="application/pdf",
-                )
+            if len(st.session_state.conversation_history_df):
+                pdf_file = generate_pdf()
+                if pdf_file:
+                    st.download_button(
+                        label="📥 Download PDF",
+                        data=pdf_file,
+                        file_name="dashboard_report.pdf",
+                        mime="application/pdf",
+                    )
+            else:
+                st.info("No summary available.")
         
         # with st.expander("View Full summary", expanded=True):
-        summary = summary()
-        sentiment_df = display_sentiment_shifts()
-        sentiment_data = plot_sentiment_data()
-        process_usage = plot_process_usage()
+        if len(st.session_state.conversation_history_df):
+            summary = summary()
+            sentiment_df = display_sentiment_shifts()
+            sentiment_data = plot_sentiment_data()
+            process_usage = plot_process_usage()
+            products = plot_products()
 
-        st.markdown(f"""<div class='curved-box'>{summary}</div>""",unsafe_allow_html=True)
-        st.plotly_chart(sentiment_data)
-        st.markdown("### Data Metrics")
-        st.dataframe(sentiment_df, use_container_width=True)
-        st.plotly_chart(process_usage)
+            st.markdown(f"""<div class='curved-box'>{summary}</div>""",unsafe_allow_html=True)
+            st.plotly_chart(sentiment_data)
+            st.markdown("### Data Metrics")
+            st.dataframe(sentiment_df, use_container_width=True)
+            st.plotly_chart(products)
+            st.plotly_chart(process_usage)
+        else:
+            st.info("No Conversation to plot graphs.")
