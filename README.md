@@ -2,6 +2,8 @@
 
 Welcome to the **Real Time AI Sales Call Assistant** project! This application is a production recommendation system with the capability to handle objections, generate questions and analyze the conversation for improvement of Sales Calls in real time using advance AI models. Built with streamlit, this tool offers a seamless and interactive user experience.
 
+![Interface](data/interface.png)
+
 ## 🚀 Features
 - **🎙️ Real-time voice transcription and analysis**
 - **🤖 Dynamic question and objection handling**
@@ -185,6 +187,7 @@ The project relies on the following key libraries:
 - **[Faiss-cpu](https://pypi.org/project/faiss-cpu/):** For the RAG implementation to recommend products
 - **[Groq](https://github.com/groq/groq-python):** For objection handling
 - **[Pandas](https://pandas.pydata.org/):** For data manipulation and analysis.
+- **[Plotly](https://plotly.com/python/):** For pictorial representation of data insights
 - **[Fpdf](https://pypi.org/project/fpdf/):** For generating and handling PDF files.
 
 
@@ -199,6 +202,7 @@ Spacy
 Faiss-cpu
 Groq
 Pandas
+Plotly
 Fpdf
 
 ## 📝 License
