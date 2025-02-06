@@ -207,7 +207,7 @@ Fpdf
 
 ## 📄 Agile Documentation
 
-For detailed sprint planning and Agile-related documentation, refer to the [Agile Sprint Plan](docs/Real Time AI Sales Call Assistant.docx).
+For detailed sprint planning and Agile-related documentation, refer to the [Agile Sprint Plan](docs/Real_Time_AI_Sales_Call_Assistant.docx).
 
 ## 📝 License
 
