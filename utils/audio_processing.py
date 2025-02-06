@@ -1,15 +1,12 @@
 import sounddevice as sd
 import wave
-import whisper
-from pydub import AudioSegment
-
-def load_whisper_model():
-    return whisper.load_model("base.en")
-
-whisper_model = load_whisper_model()
+import os
+from groq import Groq
+groq_api_key = os.getenv("GROQ_API_KEY")  
+client = Groq(api_key=groq_api_key)
 
 def record_audio(filename="data/output.wav", duration=4):
-    CHANNELS = 1
+    CHANNELS = 2
     RATE = 16000  
 
     try:
@@ -25,21 +22,23 @@ def record_audio(filename="data/output.wav", duration=4):
     except Exception as e:
         raise RuntimeError(f"Error recording audio: {e}")
 
-def transcribe_audio(audio="data/output.wav"):
+
+
+
+def transcribe_audio(audio_path="data/output.wav"):
     try:
-        import os
-        if not os.path.exists(audio):
-            raise FileNotFoundError(f"Audio file {audio} does not exist!")
+        with open(audio_path, "rb") as audio_file:
+            response = client.audio.transcriptions.create(
+                file=("audio.wav", audio_file.read()),  
+                model="whisper-large-v3-turbo",         
+                response_format="json",                 
+                language="en",                          
+                temperature=0.0                         
+            )
+        
+        return response.text
 
-        segment = AudioSegment.from_wav(audio)
-        segment = segment.set_channels(1).set_frame_rate(16000)
-        segment.export(audio, format='wav')
-
-        result = whisper_model.transcribe(audio, language="en")
-        transcription = result["text"]
-        return transcription
-
-    except FileNotFoundError as e:
-        print(e)
+    except FileNotFoundError:
+        print(f"❌ File not found: {audio_path}")
     except Exception as e:
-        print(f"Error transcribing audio: {e}")
+        print(f"⚠️ Error transcribing audio: {e}")

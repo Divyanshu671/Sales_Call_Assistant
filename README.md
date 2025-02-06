@@ -178,10 +178,11 @@ The project relies on the following key libraries:
 
 - **[Streamlit](https://streamlit.io/):** For building the interactive web application.
 - **[Sounddevice](https://pypi.org/project/sounddevice/):** For real time audio input
-- **[OpenAI-Whisper](https://github.com/openai/whisper):** For audio file transcription
+- **[Groq-Whisper](https://github.com/openai/whisper):** For audio file transcription
 - **[Pydub](https://pypi.org/project/pydub/):** For sentiment analysis of tone of user
 - **[NLTK](https://pypi.org/project/nltk/):** For sentiment analysis of text
-- **[Faiss-cpu](https://pypi.org/project/faiss-cpu/):** For the RAG implementation for recommending system
+- **[Spacy](pip install spacy):** For coverting text to word vectors for faiss
+- **[Faiss-cpu](https://pypi.org/project/faiss-cpu/):** For the RAG implementation to recommend products
 - **[Groq](https://github.com/groq/groq-python):** For objection handling
 - **[Pandas](https://pandas.pydata.org/):** For data manipulation and analysis.
 - **[Fpdf](https://pypi.org/project/fpdf/):** For generating and handling PDF files.
@@ -191,7 +192,7 @@ The project relies on the following key libraries:
 
 Streamlit
 Sounddevice
-OpenAI-Whisper
+Groq-Whisper
 Pydub
 NLTK
 Faiss-cpu
@@ -210,7 +211,8 @@ For any inquiries or feedback, please reach out to [Divyanshu Tripathi](divyansh
 ---
 
 <div align="center">
-  <img src="https://img.icons8.com/?size=100&id=4aUvAATdDLe5&format=png&color=000000" alt="Sales call assistant icon" /> 
+  <!-- <img src="https://img.icons8.com/?size=100&id=4aUvAATdDLe5&format=png&color=000000" alt="Sales call assistant icon" />  -->
+  <img src="https://img.icons8.com/?size=100&id=uZrQP6cYos2I&format=png&color=000000" alt="Sales call assistant icon" /> 
   <img src="https://img.icons8.com/?size=100&id=8hZftPYJsM6h&format=png&color=000000" alt="AI Icon" /> 
   <img src="https://img.icons8.com/?size=100&id=1GEnKV6fhh62&format=png&color=000000" alt="Summarization Icon" />
 </div>

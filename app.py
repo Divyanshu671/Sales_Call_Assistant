@@ -175,8 +175,8 @@ st.session_state.conversation_history_df = pd.read_excel(history_file, engine='o
 
 if len(st.session_state.products):
     for _, row in st.session_state.products.iterrows():
-        brand = row.get("Brand",row["Company"])
-        product = row.get("Model",row["Product"])
+        brand = row.get("Brand", row.get("Company", "Unknown Brand"))
+        product = row.get("Model",row.get("Product", "Unknown Product"))
         key = f"{brand} {product}"
         if key not in st.session_state.products_history:
             st.session_state.products_history[key] = 10
@@ -542,13 +542,16 @@ elif menu == "Dashboard":
             sentiment_df = display_sentiment_shifts()
             sentiment_data = plot_sentiment_data()
             process_usage = plot_process_usage()
-            products = plot_products()
 
             st.markdown(f"""<div class='curved-box'>{summary}</div>""",unsafe_allow_html=True)
             st.plotly_chart(sentiment_data)
             st.markdown("### Data Metrics")
             st.dataframe(sentiment_df, use_container_width=True)
-            st.plotly_chart(products)
             st.plotly_chart(process_usage)
         else:
             st.info("No Conversation to plot graphs.")
+        if len(st.session_state.products_history):
+            products = plot_products()
+            st.plotly_chart(products)
+        else:
+            st.info("No products Available to recommend.")

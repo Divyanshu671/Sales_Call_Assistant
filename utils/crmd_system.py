@@ -4,9 +4,7 @@ import spacy
 import numpy as np
 from groq import Groq
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
 key = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=key)
 nlp = spacy.load("en_core_web_md")
@@ -33,7 +31,7 @@ def recommend_product(query, data, index):
 
     distances, indices = index.search(query_vector, k)
 
-    recommendations = data.iloc[indices[0]]
+    products = recommendations = data.iloc[indices[0]]
 
     if "Brand" in recommendations.columns:  
         recommendations = recommendations.groupby("Brand").head(2) 
@@ -60,7 +58,7 @@ def recommend_product(query, data, index):
         )
 
         assistant_response = response.choices[0].message.content
-        return [recommendations,assistant_response]
+        return [products, assistant_response]
 
     except Exception as e:
         return f"Recommendation Error: {e}"
@@ -128,7 +126,7 @@ def detect_product_type(text):
 def workflow(query):
     product_type = detect_product_type(query[0])
     if product_type=="unknown":
-        return ["none","Not available",generate_objection_response(query[0],query[1],query[2])]
+        return ["","Not available",generate_objection_response(query[0],query[1],query[2])]
     laptops, mobiles = load_data()
     data = laptops if product_type.lower()=="laptops" else mobiles
 
