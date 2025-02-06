@@ -181,7 +181,7 @@ The project relies on the following key libraries:
 - **[Groq-Whisper](https://github.com/openai/whisper):** For audio file transcription
 - **[Pydub](https://pypi.org/project/pydub/):** For sentiment analysis of tone of user
 - **[NLTK](https://pypi.org/project/nltk/):** For sentiment analysis of text
-- **[Spacy](pip install spacy):** For coverting text to word vectors for faiss
+- **[Spacy](https://pypi.org/project/spacy/):** For coverting text to word vectors for faiss
 - **[Faiss-cpu](https://pypi.org/project/faiss-cpu/):** For the RAG implementation to recommend products
 - **[Groq](https://github.com/groq/groq-python):** For objection handling
 - **[Pandas](https://pandas.pydata.org/):** For data manipulation and analysis.
