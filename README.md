@@ -205,6 +205,10 @@ Pandas
 Plotly
 Fpdf
 
+## 📄 Agile Documentation
+
+For detailed sprint planning and Agile-related documentation, refer to the [Agile Sprint Plan](docs/Real Time AI Sales Call Assistant.docx).
+
 ## 📝 License
 
 This project is licensed under the [License](LICENSE.txt).
