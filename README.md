@@ -169,7 +169,7 @@ Sales_Call_Assistant/
 
 - **`app.py`**: The main Streamlit application file.
 - **`requirements.txt`**: Lists all the project dependencies.
-- **`utils/`**: Contains utility modules for table extraction and summarization.
+- **`utils/`**: Contains utility modules for internal processing and summarization.
 - **`data/`**: Directory where the images, products data and other assets are stored.
 
 ## 🧰 Dependencies
@@ -195,6 +195,7 @@ Sounddevice
 Groq-Whisper
 Pydub
 NLTK
+Spacy
 Faiss-cpu
 Groq
 Pandas
@@ -202,7 +203,7 @@ Fpdf
 
 ## 📝 License
 
-This project is licensed under the [MIT License](LICENSE.txt).
+This project is licensed under the [License](LICENSE.txt).
 
 ## 📧 Contact
 
