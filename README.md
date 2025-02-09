@@ -222,7 +222,6 @@ For any inquiries or feedback, please reach out to [Divyanshu Tripathi](divyansh
 <div align="center">
   <!-- <img src="https://img.icons8.com/?size=100&id=4aUvAATdDLe5&format=png&color=000000" alt="Sales call assistant icon" />  -->
   <img src="https://img.icons8.com/?size=100&id=uZrQP6cYos2I&format=png&color=000000" alt="Sales call assistant icon" /> 
-  <!-- <img src="https://img.icons8.com/?size=100&id=8hZftPYJsM6h&format=png&color=000000" alt="AI Icon" /> -->
-<img src="https://img.icons8.com/?size=100&id=k8dZFDofbeUb&format=png&color=000000" alt="AI Icon" /> 
+  <img src="https://img.icons8.com/?size=100&id=8hZftPYJsM6h&format=png&color=000000" alt="AI Icon" />
   <img src="https://img.icons8.com/?size=100&id=1GEnKV6fhh62&format=png&color=000000" alt="Summarization Icon" />
 </div>
