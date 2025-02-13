@@ -164,9 +164,10 @@ Sales_Call_Assistant/
 │   ├── crmd_system.py      
 │   ├── sentiment_analyzing.py      
 │   └── storing_conversations.py
-│
+
 ├── README.md         
 └── data/
+
     ├── icons
     └── available_products
 
