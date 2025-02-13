@@ -155,7 +155,7 @@ Once the application starts, follow these steps:
 ## 📁 Project Structure
 
 Sales_Call_Assistant/
-
+│
 ├── app.py           
 ├── requirements.txt            
 ├── packages.txt            
@@ -164,6 +164,7 @@ Sales_Call_Assistant/
 │  ├── crmd_system.py      
 │  ├── sentiment_analyzing.py      
 │  └── storing_conversations.py
+│
 ├── README.md         
 └── data/        
     └── icons
