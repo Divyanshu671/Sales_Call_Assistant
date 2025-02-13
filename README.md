@@ -163,10 +163,10 @@ Sales_Call_Assistant/
    ├── audio_processing.py      
    ├── crmd_system.py      
    ├── sentiment_analyzing.py      
-   └── storing_conversations.py
+   └── storing_conversations.py\
 ├── README.md         
 └── data/        
-   └── icons
+   ├── icons
    └── available_products
 
 - **`app.py`**: The main Streamlit application file.
