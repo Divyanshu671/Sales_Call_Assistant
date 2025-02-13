@@ -160,12 +160,12 @@ Sales_Call_Assistant/
 ├── requirements.txt            
 ├── packages.txt            
 ├── utils/      
-   ├── audio_processing.py      
-   ├── crmd_system.py      
-   ├── sentiment_analyzing.py      
-   └── storing_conversations.py\
+|  ├── audio_processing.py      
+|  ├── crmd_system.py      
+|  ├── sentiment_analyzing.py      
+|  └── storing_conversations.py\
 ├── README.md         
-└── data/        
+└── data/
    ├── icons
    └── available_products
 
