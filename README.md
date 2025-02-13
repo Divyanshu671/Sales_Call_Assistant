@@ -166,7 +166,7 @@ Sales_Call_Assistant/
 |  └── storing_conversations.py\
 ├── README.md         
 └── data/
-   ├── icons
+   ─── icons\
    └── available_products
 
 - **`app.py`**: The main Streamlit application file.
