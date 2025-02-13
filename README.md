@@ -158,18 +158,16 @@ Sales_Call_Assistant/
 
 ├── app.py           
 ├── requirements.txt            
-├── packages.txt            
+├── packages.txt   
 ├── utils/      
-│   ├── audio_processing.py      
-│   ├── crmd_system.py      
-│   ├── sentiment_analyzing.py      
+│   └── audio_processing.py      
+│   └── crmd_system.py      
+│   └── sentiment_analyzing.py      
 │   └── storing_conversations.py
-
 ├── README.md         
 └── data/
-
-    ├── icons
-    └── available_products
+│   └── icons
+│   └── available_products
 
 - **`app.py`**: The main Streamlit application file.
 - **`requirements.txt`**: Lists all the project dependencies.
