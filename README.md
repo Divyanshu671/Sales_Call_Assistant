@@ -157,8 +157,6 @@ Once the application starts, follow these steps:
 Sales_Call_Assistant/ \
 ├── app.py           
 ├── requirements.txt  
-├── docs/ \
-│  └── Real_Time_AI_Sales_Call_Assistant.docx\
 ├── packages.txt            
 ├── utils/     
 │  ├── audio_processing.py      
@@ -168,6 +166,8 @@ Sales_Call_Assistant/ \
 ├── data/\
 │  ├── icons \
 │  └── available_products\
+├── docs/ \
+│  └── Real_Time_AI_Sales_Call_Assistant.docx\
 └── README.md         
 
 - **`app.py`**: The main Streamlit application file.
